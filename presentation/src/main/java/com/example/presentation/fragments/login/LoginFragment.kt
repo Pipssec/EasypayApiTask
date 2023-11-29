@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.presentation.databinding.FragmentLoginBinding
 
 
 class LoginFragment() : Fragment() {
     private lateinit var binding: FragmentLoginBinding
+    private val viewModel: LoginFragmentViewModel by activityViewModels()
 
 
     interface onSomeEventListener {
@@ -39,6 +41,7 @@ class LoginFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.checkButton.setOnClickListener {
+
             someEventListener?.sendResult()
         }
     }

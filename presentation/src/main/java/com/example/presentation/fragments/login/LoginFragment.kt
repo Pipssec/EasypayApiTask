@@ -66,6 +66,8 @@ class LoginFragment() : Fragment() {
             scope.launch {
                 viewModel.checkUser(login, password)
             }
+            binding.loginEditText.text.clear()
+            binding.PasswordEditText.text.clear()
         }
     }
 
@@ -80,11 +82,6 @@ class LoginFragment() : Fragment() {
                     }
 
                     is Lce.Error -> {
-                        Toast.makeText(
-                            requireContext(),
-                            lce.exception.toString(),
-                            Toast.LENGTH_LONG
-                        ).show()
 
                     }
 

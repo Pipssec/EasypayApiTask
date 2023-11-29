@@ -6,6 +6,7 @@ import com.blogstour.app.util.AppException
 import com.blogstour.app.util.Lce
 import com.example.data.model.loginresponse.LoginResponse
 import com.example.data.model.loginresponse.UserBodyModel
+import com.example.data.model.paymentsresponse.PaymentsResponse
 import com.example.data.repository.ContentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -23,6 +24,9 @@ class SharedViewModel@Inject constructor(
 
     private val _stateLogin = MutableStateFlow<Lce<LoginResponse>>(Lce.Loading)
     val loginState = _stateLogin.asStateFlow()
+
+    private val _statePayments = MutableStateFlow<Lce<PaymentsResponse>>(Lce.Loading)
+    val paymentsState = _stateLogin.asStateFlow()
 
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
@@ -45,6 +49,23 @@ class SharedViewModel@Inject constructor(
                 _stateLogin.value = Lce.Content(body)
             } else {
                 _stateLogin.value = Lce.Error(
+                    AppException.NetworkException(result.errorBody().toString())
+                )
+            }
+        }
+    }
+
+    suspend fun getPayments(){
+        viewModelScope.launch(coroutineExceptionHandler + Dispatchers.IO) {
+            _statePayments.value = Lce.Loading
+
+            val result = contentRepository.getPayments(token)
+
+            val body = result.body()
+            if (result.isSuccessful && body != null){
+                _statePayments.value = Lce.Content(body)
+            } else {
+                _statePayments.value = Lce.Error(
                     AppException.NetworkException(result.errorBody().toString())
                 )
             }

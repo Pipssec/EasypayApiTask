@@ -21,7 +21,7 @@ class ContentRepositoryImpl@Inject constructor(
     }
 
     override suspend fun getPayments(token: String): Response<PaymentsResponse> {
-        TODO("Not yet implemented")
+        return contentService.getPayments(token = token)
     }
 
 }

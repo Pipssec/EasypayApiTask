@@ -1,16 +1,32 @@
 package com.example.presentation.fragments.login
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.presentation.R
 import com.example.presentation.databinding.FragmentLoginBinding
-import com.example.presentation.fragments.main.MainMenuFragment
+
 
 class LoginFragment() : Fragment() {
     private lateinit var binding: FragmentLoginBinding
+
+
+    interface onSomeEventListener {
+        fun sendResult()
+    }
+
+    private var someEventListener: onSomeEventListener? = null
+
+    override fun onAttach(activity: Activity) {
+        super.onAttach(activity)
+        someEventListener = try {
+            activity as onSomeEventListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$activity must implement onSomeEventListener")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,10 +39,7 @@ class LoginFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.checkButton.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .addToBackStack(null)
-                .replace(R.id.contActivity, MainMenuFragment())
-                .commit()
+            someEventListener?.sendResult()
         }
     }
 

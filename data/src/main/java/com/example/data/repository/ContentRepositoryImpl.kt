@@ -1,5 +1,6 @@
 package com.example.data.repository
 
+import android.util.Log
 import com.example.data.api.ContentService
 import com.example.data.model.loginresponse.LoginResponse
 import com.example.data.model.loginresponse.UserBodyModel
@@ -21,7 +22,9 @@ class ContentRepositoryImpl@Inject constructor(
     }
 
     override suspend fun getPayments(token: String): Response<PaymentsResponse> {
-        return contentService.getPayments(token = token)
+        val result = contentService.getPayments(token = token)
+        Log.d("result", result.body()?.response.toString())
+        return  result
     }
 
 }

@@ -1,4 +1,4 @@
-package com.blogstour.app.util
+package com.example.data.util
 
 
 sealed class AppException {

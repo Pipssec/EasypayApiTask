@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.blogstour.app.util.Lce
+import com.example.data.util.Lce
 import com.example.data.model.loginresponse.LoginResponse
 import com.example.presentation.databinding.FragmentLoginBinding
 import com.example.presentation.fragments.SharedViewModel
@@ -52,6 +52,7 @@ class LoginFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.setDefaultLoginState()
         observeStateViewModel()
         initButtonListener()
 
@@ -59,6 +60,8 @@ class LoginFragment() : Fragment() {
     }
 
     private fun initButtonListener() {
+        binding.loginEditText.text.clear()
+        binding.PasswordEditText.text.clear()
         val scope = CoroutineScope(Job())
         binding.checkButton.setOnClickListener {
             val login = binding.loginEditText.text.toString()
@@ -66,8 +69,6 @@ class LoginFragment() : Fragment() {
             scope.launch {
                 viewModel.checkUser(login, password)
             }
-            binding.loginEditText.text.clear()
-            binding.PasswordEditText.text.clear()
         }
     }
 
@@ -95,7 +96,9 @@ class LoginFragment() : Fragment() {
 
     private fun verifyResult(lce: Lce.Content<LoginResponse>) {
         if (lce.data.success == "true") {
-            viewModel.token = lce.data.response.token
+            lifecycleScope.launch {
+                viewModel.getPayments()
+            }
             someEventListener?.sendResult()
         } else {
             Toast.makeText(requireContext(), "User not found", Toast.LENGTH_LONG).show()

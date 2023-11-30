@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material3.MaterialTheme
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.presentation.databinding.FragmentMainMenuBinding
 import com.example.presentation.fragments.SharedViewModel
-import kotlinx.coroutines.runBlocking
+import com.example.presentation.fragments.compose.PaymentsContent
+import kotlinx.coroutines.launch
 
 class MainMenuFragment : Fragment() {
     private lateinit var binding: FragmentMainMenuBinding
@@ -24,19 +27,38 @@ class MainMenuFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        runBlocking {
-            viewModel.getPayments()
-        }
         binding.logoutButton.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
-            viewModel.token = ""
         }
+        binding.composeView.setContent {
+            MaterialTheme {
+                PaymentsContent(viewModel = viewModel)
+            }
+        }
+    }
+    private fun getData(){
+        lifecycleScope.launch {
+            viewModel.getPayments()
+        }
+    }
+
+    private fun observeStateViewModel() {
+        lifecycleScope.launch {
+            viewModel
+                .paymentsState.collect {
+//                    renderData(it)
+                }
+        }
+    }
+
+
+
+//    private fun renderData(data: Lce<PaymentsResponse>){
 //        binding.composeView.setContent {
 //            MaterialTheme {
-//
+//                PaymentsContent(data)
 //            }
 //        }
+//    }
 
-    }
-    
 }

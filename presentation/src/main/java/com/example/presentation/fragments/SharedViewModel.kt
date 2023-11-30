@@ -2,8 +2,8 @@ package com.example.presentation.fragments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.blogstour.app.util.AppException
-import com.blogstour.app.util.Lce
+import com.example.data.util.AppException
+import com.example.data.util.Lce
 import com.example.data.model.loginresponse.LoginResponse
 import com.example.data.model.loginresponse.UserBodyModel
 import com.example.data.model.paymentsresponse.PaymentsResponse
@@ -15,18 +15,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class SharedViewModel@Inject constructor(
     private val contentRepository: ContentRepository
 ): ViewModel() {
 
-    var token: String = ""
+    private var token: String = ""
 
     private val _stateLogin = MutableStateFlow<Lce<LoginResponse>>(Lce.Loading)
     val loginState = _stateLogin.asStateFlow()
 
     private val _statePayments = MutableStateFlow<Lce<PaymentsResponse>>(Lce.Loading)
-    val paymentsState = _stateLogin.asStateFlow()
+    val paymentsState = _statePayments.asStateFlow()
 
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
@@ -36,6 +37,7 @@ class SharedViewModel@Inject constructor(
         }
     private suspend fun handleError(error: Throwable) {
         _stateLogin.emit(Lce.Error(AppException.NetworkException(error.toString())))
+        _statePayments.emit(Lce.Error(AppException.NetworkException(error.toString())))
     }
 
     suspend fun checkUser(login: String, password: String){
@@ -47,6 +49,7 @@ class SharedViewModel@Inject constructor(
             val body = result.body()
             if (result.isSuccessful && body != null){
                 _stateLogin.value = Lce.Content(body)
+                token = body.response.token
             } else {
                 _stateLogin.value = Lce.Error(
                     AppException.NetworkException(result.errorBody().toString())
@@ -70,6 +73,10 @@ class SharedViewModel@Inject constructor(
                 )
             }
         }
+    }
+
+    fun setDefaultLoginState(){
+        _stateLogin.value = Lce.Loading
     }
 
 }
